@@ -1,0 +1,51 @@
+# Claude Code — Mémoire & Config Personnelle
+memory/
+.claude/settings.local.json
+.claude/agents/
+.claude/skills/
+
+# Secrets & Credentials (CRITICAL)
+.env.local
+.env
+.env.*.local
+*.key
+*.pem
+.github/
+github_token
+
+# Secrets & Credentials
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+credentials.json
+
+# IDE & Éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dépendances
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build & Cache
+dist/
+build/
+.next/
+.cache/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+.claude/projects/
+.claude/history.jsonl
+.claude/backups/
