@@ -1,0 +1,31 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+sqlalchemy==2.0.23
+alembic==1.12.1
+pydantic==2.4.2
+pydantic-settings==2.0.3
+python-dotenv==1.0.0
+httpx==0.25.0
+aiohttp==3.9.1
+playwright==1.40.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+pandas==2.1.2
+redis==5.0.1
+celery==5.3.4
+loguru==0.7.2
+slowapi==0.1.8
+pytrends==4.8.2
+praw==7.7.0
+stripe==7.0.0
+psycopg2-binary==2.9.9
+
+# TurboQuant: KV cache compression (6x memory reduction)
+turboquant==1.0.0
+
+# Quantization libraries for model compression
+bitsandbytes==0.42.0
+transformers>=4.40.0
+
+# Claude API optimizations
+anthropic>=0.25.0
