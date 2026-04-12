@@ -12,6 +12,12 @@ from enum import Enum
 from datetime import datetime
 from pathlib import Path
 
+from .improvements_integrated import (
+    RoleBasedPrompting, NicheSpecificFiltering,
+    IntelligenceReporting, DataIntegrationHooks,
+    AgentRole, NicheCategory
+)
+
 logger = logging.getLogger(__name__)
 
 class ProjectType(Enum):
@@ -50,7 +56,14 @@ class ClaudeCore:
         self.projects = {}
         self.agents = {}
         self.memory = {}
-        logger.info("✅ ClaudeCore initialized")
+
+        # Initialize improvements
+        self.role_prompter = RoleBasedPrompting()
+        self.niche_filter = NicheSpecificFiltering()
+        self.reporter = IntelligenceReporting()
+        self.data_integrations = DataIntegrationHooks()
+
+        logger.info("✅ ClaudeCore initialized with improvements")
 
     def _load_state(self) -> Dict:
         """Load persistent state from disk"""
@@ -72,7 +85,7 @@ class ClaudeCore:
 
     def parse_request(self, request: str, context: Optional[Dict] = None) -> Dict:
         """
-        Parse user request and classify it
+        Parse user request and classify it using role-based and niche-specific analysis
 
         Returns:
         {
@@ -80,7 +93,9 @@ class ClaudeCore:
             "project": ProjectType,
             "action": str,
             "parameters": Dict,
-            "confidence": float
+            "confidence": float,
+            "role": AgentRole (optional),
+            "niche": NicheCategory (optional)
         }
         """
         logger.info(f"[PARSE] {request[:100]}")
@@ -94,7 +109,8 @@ class ClaudeCore:
                 "project": ProjectType.CLAUDE_CORE,
                 "action": "analyze_media",
                 "parameters": {"raw_request": request},
-                "confidence": 0.9
+                "confidence": 0.9,
+                "role": AgentRole.RESEARCHER
             }
 
         # Check for project-specific requests
@@ -141,6 +157,46 @@ class ClaudeCore:
 
         return "unknown"
 
+    def _detect_niche(self, request: str) -> Optional[NicheCategory]:
+        """Detect which niche the request relates to"""
+        request_lower = request.lower()
+
+        niche_keywords = {
+            NicheCategory.TECH: ["tech", "software", "ai", "code", "development", "innovation"],
+            NicheCategory.FINANCE: ["finance", "money", "investment", "trading", "roi", "profit"],
+            NicheCategory.HEALTH: ["health", "fitness", "wellness", "medical", "diet"],
+            NicheCategory.EDUCATION: ["learning", "education", "course", "skill", "training"],
+            NicheCategory.AI: ["ai", "machine learning", "neural", "model", "training"],
+            NicheCategory.LIFESTYLE: ["lifestyle", "fashion", "travel", "home", "lifestyle"],
+            NicheCategory.ECOMMERCE: ["ecommerce", "shopify", "store", "sell", "commerce"],
+            NicheCategory.ENTERTAINMENT: ["entertainment", "funny", "meme", "comedy"],
+            NicheCategory.SOCIAL_MEDIA: ["social", "tiktok", "instagram", "youtube", "viral"],
+        }
+
+        for niche, keywords in niche_keywords.items():
+            if any(kw in request_lower for kw in keywords):
+                return niche
+
+        return None
+
+    def _select_role(self, action: str, request: str) -> AgentRole:
+        """Select optimal role based on action and request type"""
+        action_lower = action.lower()
+        request_lower = request.lower()
+
+        if any(w in action_lower for w in ["find", "analyze", "discover"]):
+            if "trend" in request_lower or "viral" in request_lower:
+                return AgentRole.TREND_ANALYST
+            return AgentRole.RESEARCHER
+        elif any(w in action_lower for w in ["create", "strategy", "plan"]):
+            return AgentRole.CONTENT_STRATEGIST
+        elif any(w in action_lower for w in ["design", "architect", "system"]):
+            return AgentRole.ARCHITECT
+        elif any(w in action_lower for w in ["implement", "build"]):
+            return AgentRole.IMPLEMENTER
+        else:
+            return AgentRole.VALIDATOR
+
     def route_request(self, parsed_request: Dict) -> Dict:
         """
         Route parsed request to appropriate handler
@@ -175,9 +231,10 @@ class ClaudeCore:
         }
 
     def _handle_project_request(self, request: Dict) -> Dict:
-        """Route to specific project handler"""
+        """Route to specific project handler with role and niche awareness"""
         project = request["project"]
         action = request["action"]
+        raw_request = request.get("parameters", {}).get("raw_request", "")
 
         handlers = {
             ProjectType.P1_PRODUCT_DISCOVERY: f"projects/p1_product_discovery/orchestrator.py",
@@ -187,15 +244,21 @@ class ClaudeCore:
             ProjectType.P5_FUTURE: f"projects/p5_future/orchestrator.py",
         }
 
-        logger.info(f"[ROUTE_PROJECT] {project.value} → {action}")
+        # Detect niche and select role
+        niche = self._detect_niche(raw_request)
+        role = self._select_role(action, raw_request)
+
+        logger.info(f"[ROUTE_PROJECT] {project.value} → {action} (role: {role.value}, niche: {niche.value if niche else 'generic'})")
 
         return {
             "status": "routed",
             "handler": handlers.get(project, "unknown"),
             "project": project.value,
             "action": action,
+            "role": role.value,
+            "niche": niche.value if niche else None,
             "parameters": request["parameters"],
-            "message": f"Routing to {project.value} handler"
+            "message": f"Routing to {project.value} with {role.value} role"
         }
 
     def process_request(self, request: str, context: Optional[Dict] = None) -> Dict:
