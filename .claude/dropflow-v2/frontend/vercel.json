@@ -4,15 +4,9 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "@vite_api_url",
-    "VITE_APP_NAME": "@vite_app_name",
-    "VITE_ENABLE_ANALYTICS": "@vite_enable_analytics"
-  },
-  "envPrefix": "VITE_",
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
+    "VITE_API_URL": "https://dropflow-api.vercel.app",
+    "VITE_APP_NAME": "DropFlow v2",
+    "VITE_ENABLE_ANALYTICS": "true"
   },
   "rewrites": [
     {
