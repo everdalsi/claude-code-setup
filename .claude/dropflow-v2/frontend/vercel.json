@@ -4,7 +4,7 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "https://discourse-sprung-blinking.ngrok-free.dev",
+    "VITE_API_URL": "https://dropflow-backend-sxv4.onrender.com",
     "VITE_APP_NAME": "DropFlow v2",
     "VITE_ENABLE_ANALYTICS": "true"
   },
