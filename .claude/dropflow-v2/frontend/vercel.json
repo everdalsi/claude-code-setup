@@ -1,0 +1,47 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "env": {
+    "VITE_API_URL": "https://dropflow-backend-sxv4.onrender.com",
+    "VITE_APP_NAME": "DropFlow v2",
+    "VITE_ENABLE_ANALYTICS": "true"
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://0.0.0.0:8000/api/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "redirects": [],
+  "cleanUrls": true,
+  "trailingSlash": false
+}
